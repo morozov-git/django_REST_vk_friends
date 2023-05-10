@@ -1,0 +1,38 @@
+version: '3.1'
+
+services:
+  # db:
+  #   image: postgres:13.1
+  #   privileged: true
+  #   ports:
+  #     - 5432:5432
+  #   environment:
+  #     POSTGRES_USER: vk-friends-user
+  #     POSTGRES_PASSWORD: 123qweA!
+  #     POSTGRES_DB: vk-friends-db
+  vk_friends_backend:
+    build: .
+    privileged: true
+    volumes:
+      - .:/django_REST_vk_friends
+
+    ports:
+      - 8080:8080
+    command:
+      bash -c "
+          python manage.py makemigrations &&
+          python manage.py migrate &&
+          gunicorn django_REST_vk_friends.wsgi -b 0.0.0.0:8080
+      "
+
+#     depends_on:
+#       - db
+#   nginx:
+#    build: ./nginx
+#    ports:
+#      - 8000:80
+#    depends_on:
+#      - vk_friends_backend
+
+
+
