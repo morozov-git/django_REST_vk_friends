@@ -12,7 +12,7 @@ router.register(r'friendship_requests', FriendshipRequestsAPIView, basename='fri
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('userfriends/<int:user>/<int:pk>/', UserFriendsDestroyAPIView.as_view()),
+    path('user_delete_friend/', UserFriendsDestroyAPIView.as_view()),
     path('get_friends_status/', GetFriendStatusAPIView.as_view(), name='get_friends_status'),
 
 ]

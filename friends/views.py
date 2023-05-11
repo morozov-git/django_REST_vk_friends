@@ -6,7 +6,7 @@ from .models import Friends, FriendshipRequest
 from .serializers import FriendsSerializer, FriendshipRequestSerializer
 from .filters import FriendsFilter, FriendshipRequestsFilter
 from .servises import check_friendschip_status, check_user_friend_params,\
-	send_friendship_request, create_friendship_request
+	send_friendship_request, update_friendship_request
 
 # Create your views here.
 
@@ -70,11 +70,19 @@ class UserFriendsDestroyAPIView(generics.DestroyAPIView):
 	serializer_class = FriendsSerializer
 
 	def destroy(self, request, *args, **kwargs):
-		user_friend_destroy = self.get_object()
-		user_friend_destroy.is_active = False
-		user_friend_destroy.save()
-		serializer = self.get_serializer(user_friend_destroy)
-		return Response(serializer.data)
+		user, friend, status = check_user_friend_params(self.request.query_params)
+		try:
+			if status == 'OK':
+				user_friend_destroy = (Friends.objects.filter(user1=user, user2=friend, is_active=True) | \
+									   Friends.objects.filter(user1=friend, user2=user, is_active=True)).get()
+				user_friend_destroy.is_active = False
+				user_friend_destroy.save()
+				serializer = self.get_serializer(user_friend_destroy)
+				return Response(serializer.data)
+			else:
+				return status
+		except:
+			return Response({'error': 'no valid data'})
 
 
 class FriendshipRequestsAPIView(mixins.CreateModelMixin,
@@ -106,7 +114,7 @@ class FriendshipRequestsAPIView(mixins.CreateModelMixin,
 	def update(self, request, pk):
 		user, friend, status = check_user_friend_params(self.request.query_params)
 		if status == 'OK':
-			return create_friendship_request(data=self, request=request, user=user, friend=friend, pk=pk)
+			return update_friendship_request(data=self, request=request, user=user, friend=friend, pk=pk)
 		else:
 			return status
 

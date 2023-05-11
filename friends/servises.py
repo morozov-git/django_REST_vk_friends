@@ -50,7 +50,7 @@ def send_friendship_request(data, request, user, friend):
 												user2=CustomUser.objects.get(id=friend),
 												is_active=True)
 			new_friend.save()
-			return Response({'Request SENT': [{'Friendship Status': ['is friended']}]})
+			return Response({'Request SENT': {'Friendship Status': 'is friended'}})
 		elif method == 'create':
 			check_request_is_already_exist = FriendshipRequest.objects.filter(sender=user,
 																			receiver=friend,
@@ -61,9 +61,9 @@ def send_friendship_request(data, request, user, friend):
 																				friendship_status='DECLINED',
 																				is_active=True)
 			if len(check_request_is_already_exist) > 0:
-				return Response({'Request SENT': [f'request is already exist']})
+				return Response({'Request SENT': f'request is already exist'})
 			elif len(check_request_is_already_declined) > 0:
-				return Response({'Request SENT': [f'request was declined']})
+				return Response({'Request SENT': f'request was declined'})
 			else:
 				new_request = FriendshipRequest.objects.create(sender=CustomUser.objects.get(id=user),
 																receiver=CustomUser.objects.get(id=friend),
@@ -76,7 +76,7 @@ def send_friendship_request(data, request, user, friend):
 		return Response({'error': ['no valid data']})
 
 
-def create_friendship_request(data, request, user, friend, pk):
+def update_friendship_request(data, request, user, friend, pk):
 	""" CONFIRMED or DECLINED actions on Friendship Ruquest """
 	user = user
 	friend = friend
@@ -99,7 +99,7 @@ def create_friendship_request(data, request, user, friend, pk):
 				get_request_to_update.friendship_status = action
 				get_request_to_update.is_active = False
 				get_request_to_update.save()
-				return Response({'Request CONFIRMED': [{'Friendship Status': ['is friended']}]})
+				return Response({'Request CONFIRMED': {'Friendship Status': 'is friended'}})
 	except:
 		return Response({'error': ['no valid data']})
 
